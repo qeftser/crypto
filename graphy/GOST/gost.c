@@ -1,0 +1,89 @@
+
+#include <stdint.h>
+#include <string.h>
+#include <stdio.h>
+#include <math.h>
+
+#define ROL11(X) X = (X << 11) | (X >> 21)
+
+uint32_t f(uint32_t R, uint32_t K) {
+   static uint8_t SB_1[16] = { 0x4, 0xa, 0x9, 0x2, 0xd, 0x8, 0x0, 0xe, 0x6, 0xb, 0x1, 0xc, 0x7, 0xf, 0x5, 0x3 };
+   static uint8_t SB_2[16] = { 0xe, 0xb, 0x4, 0xc, 0x6, 0xd, 0xf, 0xa, 0x2, 0x3, 0x8, 0x1, 0x0, 0x7, 0x5, 0x9 };
+   static uint8_t SB_3[16] = { 0x5, 0x8, 0x1, 0xd, 0xa, 0x3, 0x4, 0x2, 0xe, 0xf, 0xc, 0x7, 0x6, 0x0, 0x9, 0xb };
+   static uint8_t SB_4[16] = { 0x7, 0xd, 0xa, 0x1, 0x0, 0x8, 0x9, 0xf, 0xe, 0x4, 0x6, 0xc, 0xb, 0x2, 0x5, 0x3 };
+   static uint8_t SB_5[16] = { 0x6, 0xc, 0x7, 0x1, 0x5, 0xf, 0xd, 0x8, 0x4, 0xa, 0x9, 0xe, 0x0, 0x3, 0xb, 0x2 };
+   static uint8_t SB_6[16] = { 0x4, 0xb, 0xa, 0x0, 0x7, 0x2, 0x1, 0xd, 0x3, 0x6, 0x8, 0x5, 0x9, 0xc, 0xf, 0xe };
+   static uint8_t SB_7[16] = { 0xd, 0xb, 0x4, 0x1, 0x3, 0xf, 0x5, 0x9, 0x0, 0xa, 0xe, 0x7, 0x6, 0x8, 0x2, 0xc };
+   static uint8_t SB_8[16] = { 0x1, 0xf, 0xd, 0x0, 0x5, 0x7, 0xa, 0x4, 0x9, 0x2, 0x3, 0xe, 0x6, 0xb, 0x8, 0xc };
+   static uint8_t *SB[8] = { SB_1, SB_2, SB_3, SB_4, SB_5, SB_6, SB_7, SB_8 };
+   static uint64_t mod = 4294967295; /* 2^32 */
+
+   uint32_t split = ((uint64_t)R + K)%mod;
+   uint32_t out = 0;
+
+   for (int i = 0; i < 8; i++) {
+      out |= (SB[i][split & 0xf]);
+      out <<= 4;
+      split >>= 4;
+   }
+
+   return out;
+}
+
+void encrypt_GOST(uint64_t *block, uint32_t *key) {
+   uint8_t K[32] = {1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,
+                    1,2,3,4,5,6,7,8,8,7,6,5,4,3,2,1};
+   uint32_t Rminus,temp, L,R;
+
+   memcpy(&L,block,4);
+   memcpy(&R,((char *)block)+4,4);
+
+   for (int i = 0; i < 32; i++) {
+      Rminus = R;
+      f(R,key[K[i]]);
+      ROL11(R);
+      R ^= L;
+      L = Rminus;
+   }
+   
+   memcpy(block,&L,4);
+   memcpy(((char *)block)+4,&R,4);
+}
+
+void decrypt_GOST(uint64_t *block, uint32_t *key) {
+   uint8_t K[32] = {1,2,3,4,5,6,7,8,8,7,6,5,4,3,2,1,
+                    8,7,6,5,4,3,2,1,8,7,6,5,4,3,2,1};
+   uint32_t Rminus,temp, L,R;
+
+   memcpy(&R,block,4);
+   memcpy(&L,((char *)block)+4,4);
+
+   for (int i = 0; i < 32; i++) {
+      Rminus = R;
+      f(R,key[K[i]]);
+      ROL11(R);
+      R ^= L;
+      L = Rminus;
+   }
+   
+   memcpy(block,&R,4);
+   memcpy(((char *)block)+4,&L,4);
+}
+
+int main(void) {
+
+   uint64_t num = 1234;
+   uint32_t key[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+   printf("before:  %lu\n",num);
+
+   encrypt_GOST(&num,key);
+
+   printf("encrypt: %lu\n",num);
+
+   decrypt_GOST(&num,key);
+
+   printf("decrypt: %lu\n",num);
+
+   return 0;
+}
