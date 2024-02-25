@@ -13,10 +13,11 @@
 
 uint32_t O(uint32_t r, uint32_t c, uint16_t P) {
    uint32_t val = ((c + ((r * 17) ^ 0xff)) & 0xff);
-   for (int i = 0; i < 31; i++) {
-      val = (val * val) % P;
+   uint32_t accum = val;
+   for (int i = 0; i < 5; i++) {
+      accum = (accum * accum) % P;
    }
-   return val;
+   return accum/val;
 }
 
 void binary_print(uint32_t in) {
@@ -68,6 +69,11 @@ uint64_t encrypt_LOKI(uint64_t block, uint64_t key) {
    memcpy(&L,&block,4);
    memcpy(&R,((char *)&block)+4,4);
 
+   binary_print(L);
+   printf("    ");
+   binary_print(R);
+   printf("\n");
+
    /* split key */
    memcpy(&KL,&key,4);
    memcpy(&KR,((char *)&key)+4,4);
@@ -78,6 +84,12 @@ uint64_t encrypt_LOKI(uint64_t block, uint64_t key) {
    for (int i = 0; i < 16; i++) {
       /* XOR */
       RX = R ^ KL;
+      binary_print(R);
+      printf(" XOR ");
+      binary_print(KL);
+      printf(" --> ");
+      binary_print(RX);
+      printf("\n");
       if (i % 2) {
          ROL13(KL);
          swap(KL,KR);
@@ -142,7 +154,7 @@ uint64_t decrypt_LOKI(uint64_t block, uint64_t key) {
    /* split block */
    memcpy(&L,&block,4);
    memcpy(&R,((char *)&block)+4,4);
-
+   swap(L,R);
 
    /* split key */
    memcpy(&KL,&key,4);
@@ -156,8 +168,6 @@ uint64_t decrypt_LOKI(uint64_t block, uint64_t key) {
    //putchar('\n');
 
    for (int i = 0; i < 16; i++) {
-      /* XOR */
-      RX = R ^ KL;
       if (!(i % 2)) {
          swap(KL,KR);
          ROR13(KL);
@@ -165,8 +175,15 @@ uint64_t decrypt_LOKI(uint64_t block, uint64_t key) {
       else {
          ROR12(KL);
       }
-      //binary_print(KL);
-      //putchar('\n');
+
+      /* XOR */
+      RX = R ^ KL;
+      binary_print(R);
+      printf(" XOR ");
+      binary_print(KL);
+      printf(" --> ");
+      binary_print(RX);
+      printf("\n");
 
       /* expansion permutation */
       RE = 0;
@@ -188,8 +205,14 @@ uint64_t decrypt_LOKI(uint64_t block, uint64_t key) {
       swap(L,R);
    }
 
+   printf("\n");
+   binary_print(L);
+   printf("    ");
+   binary_print(R);
+   printf("\n");
 
    /* copy results in */
+   swap(R,L);
    memcpy(&block,&L,4);
    memcpy(((char *)&block)+4,&R,4);
 
