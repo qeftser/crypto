@@ -3,7 +3,7 @@
 CC := gcc
 
 # other variables
-OUTPUT := tst
+OUTPUT := tst.e
 CC_FLAGS := -g -O3 -Wall -Wextra -Wpedantic -mavx2 -mfma -mcx16
 LD_FLAGS := -O3
 
@@ -20,7 +20,7 @@ $(OUTPUT): $(OBJ_FILES) Makefile
 	$(CC) -c $(CC_FLAGS) $< -o $@
 
 clean:
-	rm -f $(OBJ_FILES) ./tst
+	rm -f $(OBJ_FILES) ./tst.e
 
 run: $(OUTPUT)
-	./tst 
+	./tst.e
