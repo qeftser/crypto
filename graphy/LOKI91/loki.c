@@ -69,11 +69,6 @@ uint64_t encrypt_LOKI(uint64_t block, uint64_t key) {
    memcpy(&L,&block,4);
    memcpy(&R,((char *)&block)+4,4);
 
-   binary_print(L);
-   printf("    ");
-   binary_print(R);
-   printf("\n");
-
    /* split key */
    memcpy(&KL,&key,4);
    memcpy(&KR,((char *)&key)+4,4);
@@ -84,12 +79,6 @@ uint64_t encrypt_LOKI(uint64_t block, uint64_t key) {
    for (int i = 0; i < 16; i++) {
       /* XOR */
       RX = R ^ KL;
-      binary_print(R);
-      printf(" XOR ");
-      binary_print(KL);
-      printf(" --> ");
-      binary_print(RX);
-      printf("\n");
       if (i % 2) {
          ROL13(KL);
          swap(KL,KR);
@@ -97,8 +86,6 @@ uint64_t encrypt_LOKI(uint64_t block, uint64_t key) {
       else {
          ROL12(KL);
       }
-      //binary_print(KL);
-      //putchar('\n');
 
       /* expansion permutation */
       RE = 0;
@@ -117,13 +104,6 @@ uint64_t encrypt_LOKI(uint64_t block, uint64_t key) {
 
       L ^= RP;
       swap(L,R);
-
-      /*
-      binary_print(L);
-      putchar(' ');
-      binary_print(R);
-      putchar('\n');
-      */
    }
 
    /* copy results in */
@@ -178,12 +158,6 @@ uint64_t decrypt_LOKI(uint64_t block, uint64_t key) {
 
       /* XOR */
       RX = R ^ KL;
-      binary_print(R);
-      printf(" XOR ");
-      binary_print(KL);
-      printf(" --> ");
-      binary_print(RX);
-      printf("\n");
 
       /* expansion permutation */
       RE = 0;
@@ -204,12 +178,6 @@ uint64_t decrypt_LOKI(uint64_t block, uint64_t key) {
       L ^= RP;
       swap(L,R);
    }
-
-   printf("\n");
-   binary_print(L);
-   printf("    ");
-   binary_print(R);
-   printf("\n");
 
    /* copy results in */
    swap(R,L);
