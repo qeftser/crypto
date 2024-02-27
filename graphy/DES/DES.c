@@ -280,16 +280,16 @@ int main(void) {
 
    uint64_t key = 0x0123456789abcdef;
 
-   printf("before: %lu\n", num);
+   printf("before: %lx\n", num);
 
    num = encrypt_DES(num,key);
 
-   printf("after:  %lu\n", num);
+   printf("after:  %lx\n", num);
 
-   printf("expct:  %lu\n",0xc95744256a5ed31d);
+   printf("expct:  %lx\n",0xc95744256a5ed31d);
 
    num = decrypt_DES(num,key);
 
-   printf("decry:  %lu\n", num);
+   printf("decry:  %lx\n", num);
 }
 
