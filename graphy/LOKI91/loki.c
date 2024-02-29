@@ -3,7 +3,16 @@
 #include <string.h>
 #include <stdio.h>
 #include <math.h>
-#include "bits.h"
+#include "../bits.h"
+
+const unsigned long int BIT[64] = { b01, b02, b03, b04, b05, b06, b07, b08, 
+                                    b09, b10, b11, b12, b13, b14, b15, b16,
+                                    b17, b18, b19, b20, b21, b22, b23, b24,
+                                    b25, b26, b27, b28, b29, b30, b31, b32, 
+                                    b33, b34, b35, b36, b37, b38, b39, b40,
+                                    b41, b42, b43, b44, b45, b46, b47, b48,
+                                    b49, b50, b51, b52, b53, b54, b55, b56,
+                                    b57, b58, b59, b60, b61, b62, b63, b64 };
 
 #define ROL12(x) x = ((x << 12) | (x >> 20))
 #define ROR12(x) x = ((x >> 12) | (x << 20))
@@ -14,17 +23,20 @@
 uint32_t O(uint32_t r, uint32_t c, uint16_t P) {
    uint32_t val = ((c + ((r * 17) ^ 0xff)) & 0xff);
    uint32_t accum = val;
-   for (int i = 0; i < 5; i++) {
+   for (int i = 0; i < 4; i++) {
       accum = (accum * accum) % P;
    }
+   if (!(accum & val)) return 0;
    return accum/val;
 }
 
+/*
 void binary_print(uint32_t in) {
    for (int i = 31; i >= 0; i--) {
       if (in & BIT[i]) putchar('1'); else putchar('0');
    }
 }
+*/
 
 uint32_t s_box(uint64_t R) {
    uint16_t P[16] =    { 375, 379, 391, 395, 397, 415, 419, 425,
@@ -186,24 +198,4 @@ uint64_t decrypt_LOKI(uint64_t block, uint64_t key) {
 
    return block;
 }
-
-
-int main(void) {
-   
-   uint64_t num = 0x1123456789abcdef;
-   uint64_t key = 0x0100000000000010;
-
-   printf("original:  %lu\n",num);
-
-   num = encrypt_LOKI(num,key);
-
-   printf("encrypted: %lu\n",num);
-
-   num = decrypt_LOKI(num,key);
-
-   printf("decrypted: %lu\n",num);
-
-   return 0;
-}
-
 

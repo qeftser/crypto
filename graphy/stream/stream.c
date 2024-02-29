@@ -2,8 +2,8 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <limits.h>
-#include "bits.h"
-#include "primitive_polynomials.h"
+#include "../bits.h"
+#include "stream.h"
 
 /*********************************************************************
  * LSFR64 
@@ -11,7 +11,6 @@
  * Will hold all primitive polynomials that can be stored in
  * a 64-bit word
  *********************************************************************/
-struct LSFR64 { uint64_t stream; uint8_t tap_num; uint8_t *taps; };
 
 void init_LSFR64(struct LSFR64 *lsfr, uint8_t *init_a) {
    lsfr->tap_num = init_a[0];
@@ -45,7 +44,6 @@ uint8_t shift_LSFR64(struct LSFR64 *lsfr) {
  * If you want the generator to be maximal length please limit the 
  * length in bits of your keys to 11, 18, and 35 respectivly.
  *********************************************************************/
-struct Geffe { uint64_t iteration; struct LSFR64 lsfr1; struct LSFR64 lsfr2; struct LSFR64 lsfr3; };
 
 uint8_t shift_Geffe(struct Geffe *);
 void init_Geffe(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, struct Geffe *g) {
@@ -57,7 +55,7 @@ void init_Geffe(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift,
    g->lsfr1.stream = key1;
    g->lsfr2.stream = key2;
    g->lsfr3.stream = key3;
-   for (int i = 0; i < pre_shift; i++) {
+   for (unsigned long int i = 0; i < pre_shift; i++) {
       shift_Geffe(g);
    }
 }
@@ -82,7 +80,6 @@ uint8_t shift_Geffe(struct Geffe *g) {
  * If you want the generator to be maximal length please limit the 
  * length in bits of your keys to 11, 18, and 35 respectivly.
  *********************************************************************/
-struct BPSaG { uint8_t a[3]; uint64_t iteration; struct LSFR64 lsfr1; struct LSFR64 lsfr2; struct LSFR64 lsfr3;};
 
 uint8_t shift_BPSaG(struct BPSaG *);
 void init_BPSaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, struct BPSaG *b) {
@@ -95,7 +92,7 @@ void init_BPSaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift,
    b->lsfr1.stream = key1;
    b->lsfr2.stream = key2;
    b->lsfr3.stream = key3;
-   for (int i = 0; i < pre_shift; i++) {
+   for (unsigned long int i = 0; i < pre_shift; i++) {
       shift_BPSaG(b);
    }
 }
@@ -120,7 +117,6 @@ uint8_t shift_BPSaG(struct BPSaG *b) {
  * If you want the generator to be maximal length please limit the 
  * length in bits of your keys to 49 and 50 respectivly.
  *********************************************************************/
-struct BSaG { uint8_t ab[6]; uint64_t iteration; struct LSFR64 lsfr1; struct LSFR64 lsfr2; };
 
 uint8_t shift_BSaG(struct BSaG *);
 void init_BSaG(uint64_t key1, uint64_t key2, uint64_t pre_shift, struct BSaG *b) {
@@ -132,7 +128,7 @@ void init_BSaG(uint64_t key1, uint64_t key2, uint64_t pre_shift, struct BSaG *b)
    b->iteration = 0;
    b->lsfr1.stream = key1;
    b->lsfr2.stream = key2;
-   for (int i = 0; i < pre_shift; i++) {
+   for (unsigned long int i = 0; i < pre_shift; i++) {
       shift_BSaG(b);
    }
 }
@@ -169,7 +165,6 @@ uint8_t shift_BSaG(struct BSaG *b) {
  * If you want the generator to be maximal length please limit the 
  * length in bits of your keys to 41, 55, and 63 respectivly.
  *********************************************************************/
-struct ASaG { uint8_t bc[2]; uint64_t iteration; struct LSFR64 lsfr1; struct LSFR64 lsfr2; struct LSFR64 lsfr3;};
 
 uint8_t shift_ASaG(struct ASaG *);
 void init_ASaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, struct ASaG *a) {
@@ -182,7 +177,7 @@ void init_ASaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, 
    a->lsfr1.stream = key1;
    a->lsfr2.stream = key2;
    a->lsfr3.stream = key3;
-   for (int i = 0; i < pre_shift; i++) {
+   for (unsigned long int i = 0; i < pre_shift; i++) {
       shift_ASaG(a);
    }
 }
@@ -204,7 +199,6 @@ uint8_t shift_ASaG(struct ASaG *a) {
  * This is an additive generator.
  * Both keys must be arrays of 56 32-bit integers
  *********************************************************************/
-struct Fish { uint32_t A[56]; uint32_t B[56]; uint8_t I; };
 
 void shift_Fish(uint32_t *, uint32_t *, struct Fish *);
 void init_Fish(uint32_t * keyA, uint32_t * keyB, struct Fish * fish) {
@@ -242,7 +236,6 @@ void shift_Fish(uint32_t * R2i, uint32_t * R2ip1, struct Fish * fish) {
  * This is an additive generator.
  * Both keys must be arrays of 60 32-bit integers
  *********************************************************************/
-struct Pike { uint8_t carry[3]; uint32_t A[60]; uint32_t B[60]; uint32_t C[60]; uint8_t I[3]; };
 
 uint32_t shift_Pike(struct Pike *);
 void init_Pike(uint32_t * keyA, uint32_t * keyB, uint32_t * keyC, struct Pike * pike) {
@@ -320,7 +313,6 @@ uint32_t shift_Pike(struct Pike *pike) {
  * This is an additive generator.
  * Both keys must be arrays of 56 32-bit integers
  *********************************************************************/
-struct Mush { uint8_t carry[2]; uint32_t A[56]; uint32_t B[56]; uint8_t I[2]; };
 
 uint32_t shift_Mush(struct Mush *);
 void init_Mush(uint32_t * keyA, uint32_t *keyB, struct Mush *mush) {
@@ -363,38 +355,3 @@ uint32_t shift_Mush(struct Mush *mush) {
    return mush->A[mush->I[0]] ^ mush->B[mush->I[1]];
 }
 
-
-
-int main(void) {
-
-   uint32_t n1 = 0xffffffff;
-   uint32_t n2 = 0xffffffff;
-   uint32_t n3 = n1 + n2;
-
-   printf("%u + %u = %u\n",n1,n2,n3);
-
-   uint32_t keyA[60] = { 1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,
-                         4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6};
-   uint32_t keyB[60] = { 1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,
-                         4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6};
-   uint32_t keyC[60] = { 1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,
-                         4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6};
-   int num = 0;
-
-   struct Mush mush;
-
-   init_Mush(keyA,keyB,&mush);
-
-   for (int i = 0; i < 1000000000; i++) {
-      num += shift_Mush(&mush);
-      /*
-      printf("%08x ",shift_Mush(&mush));
-      if (i % 26 == 0) putchar('\n');
-      */
-   }
-   putchar('\n');
-   printf("num: %d\n",num);
-
-
-   return 0;
-}

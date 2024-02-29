@@ -3,8 +3,10 @@
 #include <stdio.h>
 #include <limits.h>
 #include <string.h>
-#include "bits.h"
+#include "../bits.h"
 
+
+/*
 void binary_print(uint64_t block) {
    for (int i = 31; i >= 0; i--) {
       if (block & BIT[i]) putchar('1'); else putchar('0');
@@ -22,6 +24,7 @@ void half_binary_print(uint32_t bloc1, uint32_t bloc2) {
    }
    printf("\n");
 }
+*/
 
 uint64_t operate_DES(uint64_t block, uint64_t key, uint8_t e_d) {
    /* constant arrays */
@@ -272,24 +275,5 @@ uint64_t encrypt_DES(uint64_t block, uint64_t key) {
 
 uint64_t decrypt_DES(uint64_t block, uint64_t key) {
    return operate_DES(block,key,0);
-}
-
-int main(void) {
-
-   unsigned long num = 0x0123456789abcde7;
-
-   uint64_t key = 0x0123456789abcdef;
-
-   printf("before: %lx\n", num);
-
-   num = encrypt_DES(num,key);
-
-   printf("after:  %lx\n", num);
-
-   printf("expct:  %lx\n",0xc95744256a5ed31d);
-
-   num = decrypt_DES(num,key);
-
-   printf("decry:  %lx\n", num);
 }
 

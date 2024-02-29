@@ -3,6 +3,7 @@
 
 #define CRYPTOGRAPHY_DEFINITIONS
 #include <stdint.h>
+#include "./stream/stream.h"
 
 uint64_t encrypt_DES(uint64_t, uint64_t);
 uint64_t decrypt_DES(uint64_t, uint64_t);

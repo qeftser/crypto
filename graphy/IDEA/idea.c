@@ -175,24 +175,3 @@ void decrypt_IDEA(uint64_t *block, uint64_t * key) {
    memcpy(block,X,8);
 }
 
-int main(void) {
-
-   srand(clock());
-
-   uint64_t num = rand();
-
-   uint64_t key[2] =  { rand(), rand() };
-
-   printf("init: %016lx\n",num);
-
-   encrypt_IDEA(&num,key);
-
-   printf("encr: %016lx\n",num);
-
-   decrypt_IDEA(&num,key);
-
-   printf("decr: %016lx\n",num);
-
-
-   return 0;
-}

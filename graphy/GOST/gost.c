@@ -6,7 +6,7 @@
 
 #define ROL11(X) X = (X << 11) | (X >> 21)
 
-uint32_t f(uint32_t R, uint32_t K) {
+uint32_t f_GOST(uint32_t R, uint32_t K) {
    static uint8_t SB_1[16] = { 0x4, 0xa, 0x9, 0x2, 0xd, 0x8, 0x0, 0xe, 0x6, 0xb, 0x1, 0xc, 0x7, 0xf, 0x5, 0x3 };
    static uint8_t SB_2[16] = { 0xe, 0xb, 0x4, 0xc, 0x6, 0xd, 0xf, 0xa, 0x2, 0x3, 0x8, 0x1, 0x0, 0x7, 0x5, 0x9 };
    static uint8_t SB_3[16] = { 0x5, 0x8, 0x1, 0xd, 0xa, 0x3, 0x4, 0x2, 0xe, 0xf, 0xc, 0x7, 0x6, 0x0, 0x9, 0xb };
@@ -33,14 +33,14 @@ uint32_t f(uint32_t R, uint32_t K) {
 void encrypt_GOST(uint64_t *block, uint32_t *key) {
    uint8_t K[32] = {1,2,3,4,5,6,7,8,1,2,3,4,5,6,7,8,
                     1,2,3,4,5,6,7,8,8,7,6,5,4,3,2,1};
-   uint32_t Rminus,temp, L,R;
+   uint32_t Rminus,L,R;
 
    memcpy(&L,block,4);
    memcpy(&R,((char *)block)+4,4);
 
    for (int i = 0; i < 32; i++) {
       Rminus = R;
-      f(R,key[K[i]]);
+      f_GOST(R,key[K[i]]);
       ROL11(R);
       R ^= L;
       L = Rminus;
@@ -53,14 +53,14 @@ void encrypt_GOST(uint64_t *block, uint32_t *key) {
 void decrypt_GOST(uint64_t *block, uint32_t *key) {
    uint8_t K[32] = {1,2,3,4,5,6,7,8,8,7,6,5,4,3,2,1,
                     8,7,6,5,4,3,2,1,8,7,6,5,4,3,2,1};
-   uint32_t Rminus,temp, L,R;
+   uint32_t Rminus, L,R;
 
    memcpy(&R,block,4);
    memcpy(&L,((char *)block)+4,4);
 
    for (int i = 0; i < 32; i++) {
       Rminus = R;
-      f(R,key[K[i]]);
+      f_GOST(R,key[K[i]]);
       ROL11(R);
       R ^= L;
       L = Rminus;
@@ -70,20 +70,3 @@ void decrypt_GOST(uint64_t *block, uint32_t *key) {
    memcpy(((char *)block)+4,&L,4);
 }
 
-int main(void) {
-
-   uint64_t num = 1234;
-   uint32_t key[8] = { 1, 2, 3, 4, 5, 6, 7, 8 };
-
-   printf("before:  %lu\n",num);
-
-   encrypt_GOST(&num,key);
-
-   printf("encrypt: %lu\n",num);
-
-   decrypt_GOST(&num,key);
-
-   printf("decrypt: %lu\n",num);
-
-   return 0;
-}
