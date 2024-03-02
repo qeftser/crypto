@@ -83,7 +83,7 @@ uint8_t shift_Geffe(struct Geffe *g) {
 
 uint8_t shift_BPSaG(struct BPSaG *);
 void init_BPSaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, struct BPSaG *b) {
-   static uint8_t k1[3]={2,11,2},k2[5]={4,18,5,2,1},k3[3]={2,35,2};
+   uint8_t k1[3]={2,11,2},k2[5]={4,18,5,2,1},k3[3]={2,35,2};
    init_LSFR64(&b->lsfr1,k1);
    init_LSFR64(&b->lsfr2,k2);
    init_LSFR64(&b->lsfr3,k3);
@@ -168,7 +168,7 @@ uint8_t shift_BSaG(struct BSaG *b) {
 
 uint8_t shift_ASaG(struct ASaG *);
 void init_ASaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, struct ASaG *a) {
-   static uint8_t k1[3]={2,4,1},k2[3]={2,55,24},k3[3]={2,63,1};
+   uint8_t k1[3]={2,4,1},k2[3]={2,55,24},k3[3]={2,63,1};
    init_LSFR64(&a->lsfr1,k1);
    init_LSFR64(&a->lsfr2,k2);
    init_LSFR64(&a->lsfr3,k3);

@@ -5,7 +5,7 @@
 #include <time.h>
 
 #define MEGABYTE 1024 * 1024 * 8
-#define ENCRYPTION_SIZE 1024
+#define ENCRYPTION_SIZE 10
 #define TOTAL_CIPHERS 13
 
 #define PRINT_RES(a) printf("%-10s|%11ld|   % 14.6f| % 18.6f|\n", \

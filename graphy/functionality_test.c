@@ -7,14 +7,14 @@
 
 #define ROL1(a) a = (a << 1) | (a >> 63)
 
-const unsigned long int cycles = 1;
+const unsigned long int cycles = 1000000;
 
 int main(void) {
 
 
    uint64_t res0, num0 = 0x0123456789abcdef;
    uint32_t res1[4], num1[4] = { 0x0123, 0x4567, 0x89ab, 0xcdef };
-   uint32_t resA, resB, numA, numB;
+   uint32_t resA, resB, numA, numB, intrmA, intrmB;
 
    uint32_t gen[4];
 
@@ -39,9 +39,12 @@ int main(void) {
       res0 = encrypt_DES(num0,key0);
       res0 = decrypt_DES(res0,key0);
       
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
-
+      if (num0 != res0) {
+         printf("DES FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
 
    /* testing FEAL */
@@ -53,8 +56,12 @@ int main(void) {
       res0 = encrypt_FEAL(num0,key0);
       res0 = decrypt_FEAL(res0,key0);
 
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
+      if (num0 != res0) {
+         printf("FEAL FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
 
    /* testing GOST */
@@ -68,8 +75,12 @@ int main(void) {
       encrypt_GOST(&res0,key1);
       decrypt_GOST(&res0,key1);
 
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
+      if (num0 != res0) {
+         printf("FEAL FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
 
    /* testing LOKI */
@@ -81,8 +92,12 @@ int main(void) {
       res0 = encrypt_LOKI(num0,key0);
       res0 = decrypt_LOKI(res0,key0);
 
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
+      if (num0 != res0) {
+         printf("FEAL FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
    
    /* testing MMB */
@@ -92,19 +107,12 @@ int main(void) {
       encrypt_MMB(res1,key2);
       decrypt_MMB(res1,key2);
 
-      /*
-      printf("num: ");
-      for (int i = 0; i < 4; i++) {
-         printf("%d ",num1[i]);
+      if (num1[0] != res1[0] || num1[1] != res1[1] || num1[2] != res1[2] || num1[3] != res1[3]) {
+         printf("MMB FAILED\n");
+         printf("On key: %08x %08x %08x %08x\n",key1[0],key1[1],key1[2],key1[2]);
+         printf("On val: %08x %08x %08x %08x\n",num1[0],num1[1],num1[2],num1[3]);
+         break;
       }
-      printf("<> res: ");
-      for (int i = 0; i < 4; i++) {
-         printf("%d ",res1[i]);
-      }
-      printf("\n");
-      */
-      printf("num = res? %d\n",num1[0] == res1[0] && num1[1] == res1[1] &&
-                               num1[2] == res1[2] && num1[3] == res1[3]);
    }
 
    /* testing IDEA */
@@ -117,8 +125,13 @@ int main(void) {
       res0 = num0;
       encrypt_IDEA(&res0,key3);
       decrypt_IDEA(&res0,key3);
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
+
+      if (num0 != res0) {
+         printf("IDEA FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
 
    struct Geffe geffe;
@@ -140,14 +153,17 @@ int main(void) {
          ROL1(res0);
       }
 
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
+      if (num0 != res0) {
+         printf("Geffe FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
 
    struct BPSaG bpsag;
 
    /* testing BPSaG */
-   /* BROKEN */
    for (unsigned long int i = 0; i < cycles; i++) {
       for (int i = 0; i < 3; i++) key5[i] = rand()*rand();
       gen[0] = rand(); gen[1] = rand();
@@ -164,8 +180,12 @@ int main(void) {
          ROL1(res0);
       }
 
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
+      if (num0 != res0) {
+         printf("BPSaG FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
 
    struct BSaG bsag;
@@ -189,14 +209,17 @@ int main(void) {
          ROL1(res0);
       }
 
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
+      if (num0 != res0) {
+         printf("BSaG FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
 
    struct ASaG asag;
 
    /* testing ASaG */
-   /* BROKEN */
    for (unsigned long int i = 0; i < cycles; i++) {
       for (int i = 0; i < 3; i++) key5[i] = rand()*rand();
       gen[0] = rand(); gen[1] = rand();
@@ -213,24 +236,32 @@ int main(void) {
          ROL1(res0);
       }
 
-      //printf("num: %lu <> res: %lu\n",num0,res0);
-      printf("num = res? %d\n",num0 == res0);
+      if (num0 != res0) {
+         printf("ASaG FAILED\n");
+         printf("On key: %016lx\n",key0);
+         printf("On val: %016lx\n",num0);
+         break;
+      }
    }
 
    struct Fish fish;
 
    /* testing Fish */
-   /* BROKEN */
    for (unsigned long int i = 0; i < cycles; i++) {
       for (int i = 0; i < 60; i++) { key4[i] = rand(); key6[i] = rand(); }
       resA = numA = rand(); resB = numB = rand();
       init_Fish(key4,key6,&fish);
-      shift_Fish(&resA,&resB,&fish);
+      shift_Fish(&intrmA,&intrmB,&fish);
+      resA ^= intrmA; resB ^= intrmB;
       init_Fish(key4,key6,&fish);
-      shift_Fish(&resA,&resB,&fish);
+      shift_Fish(&intrmA,&intrmB,&fish);
+      resA ^= intrmA; resB ^= intrmB;
 
-      //printf("num: %u:%u <> res: %u:%u\n",numA,numB,resA,resB);
-      printf("num = res? %d\n",numA == resA && numB == resB);
+      if (numA != resA || numB != resB) {
+         printf("Fish FAILED\n");
+         printf("On val: %08x %08x\n",numA,numB);
+         break;
+      }
    }
 
    struct Pike pike;
@@ -245,8 +276,11 @@ int main(void) {
       init_Pike(key4,key6,key7,&pike);
       resA ^= shift_Pike(&pike);
 
-      //printf("num: %u <> res: %u\n",numA,resA);
-      printf("num = res? %d\n",numA == resA);
+      if (numA != resA) {
+         printf("Pike FAILED\n");
+         printf("On val: %08x\n",numA);
+         break;
+      }
    }
 
    struct Mush mush;
@@ -261,8 +295,11 @@ int main(void) {
       init_Mush(key4,key6,&mush);
       resA ^= shift_Mush(&mush);
 
-      //printf("num: %u <> res: %u\n",numA,resA);
-      printf("num = res? %d\n",numA == resA);
+      if (numA != resA) {
+         printf("Mush FAILED\n");
+         printf("On val: %08x\n",numA);
+         break;
+      }
    }
 
    return 0;
