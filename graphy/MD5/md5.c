@@ -161,8 +161,6 @@ int main(void) {
 
    char * msg;
 
-   srand(1);
-
    msg = malloc(sizeof(char)*count);
    for (long int i = 0; i < count; i++) {
       msg[i] = rand();
