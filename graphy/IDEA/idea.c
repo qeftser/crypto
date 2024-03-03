@@ -47,6 +47,22 @@ int mod_inverse(int A, int M)
 	}
 }
 
+void generate_keys(uint64_t *key, uint16_t *Z) {
+   uint64_t key_cpy[2];
+   memcpy(key_cpy,key,16);
+
+   /* mass generate all the keys at once
+    * possibility to optimize here
+    */
+   for (int i = 0; i < 9; i++) {
+      memcpy(&Z[i*6],key_cpy,16);
+      ROL25(key_cpy[0],key_cpy[1]);
+   }
+   /* ensure strong keys */
+   for (int i = 0; i < 54; i++) {
+      Z[i] = Z[i] ^ 0x0dae;
+   }
+}
 
 void invert_keys(uint16_t * keys) {
    int idx;
@@ -65,21 +81,13 @@ void encrypt_IDEA(uint64_t *block, uint64_t * key) {
    uint16_t X[4];
    uint16_t temp;
    uint16_t S[10];
-   uint64_t key_cpy[2];
    int idx;
 
-   memcpy(key_cpy,key,16);
+   generate_keys(key,Z);
 
-   /* mass generate all the keys at once
-    * possibility to optimize here
-    */
-   for (int i = 0; i < 9; i++) {
-      memcpy(&Z[i*6],key_cpy,16);
-      ROL25(key_cpy[0],key_cpy[1]);
-   }
-   /* ensure strong keys */
+   printf("ENCRYPT KEYS:\n");
    for (int i = 0; i < 54; i++) {
-      Z[i] = Z[i] ^ 0x0dae;
+      printf("Z[%d] = %d\n",i,Z[i]);
    }
 
    /* load blocks */
@@ -103,13 +111,6 @@ void encrypt_IDEA(uint64_t *block, uint64_t * key) {
       X[2] = S[1] ^ S[9];
       X[3] = S[3] ^ S[9];
 
-      /*
-      printf("ENCRYPT\n");
-      for (int i = 0; i < 4; i++) {
-         printf("S%d: %d\n",i,X[i]);
-      }
-      */
-
       // couldn't figure out the swaps here
       swap(X[1],X[2]);
    }
@@ -129,24 +130,15 @@ void decrypt_IDEA(uint64_t *block, uint64_t * key) {
    uint16_t X[4];
    uint16_t temp;
    uint16_t S[10];
-   uint64_t key_cpy[2];
    int idx;
 
-   memcpy(key_cpy,key,16);
-
-   /* mass generate all the keys at once
-    * possibility to optimize here
-    */
-   for (int i = 0; i < 9; i++) {
-      memcpy(&Z[i*6],key_cpy,16);
-      ROL25(key_cpy[0],key_cpy[1]);
-   }
-   /* ensure strong keys */
-   for (int i = 0; i < 54; i++) {
-      Z[i] = Z[i] ^ 0x0dae;
-   }
-
+   generate_keys(key,Z);
    invert_keys(Z);
+
+   printf("DECRYPT KEYS:\n");
+   for (int i = 0; i < 54; i++) {
+      printf("Z[%d] = %d\n",i,Z[i]);
+   }
 
    /* load blocks */
    memcpy(X,block,8);
@@ -169,13 +161,6 @@ void decrypt_IDEA(uint64_t *block, uint64_t * key) {
       X[2] = S[1] ^ S[9];
       X[3] = S[3] ^ S[9];
 
-      /*
-      printf("DECRYPT\n");
-      for (int i = 0; i < 4; i++) {
-         printf("S%d: %d\n",i,X[i]);
-      }
-      */
-
       // Couldn't figure out the spelling here
       swap(X[1],X[2]);
    }
@@ -184,12 +169,6 @@ void decrypt_IDEA(uint64_t *block, uint64_t * key) {
    X[1] = ADDM216(X[1],Z[1]);
    X[2] = ADDM216(X[2],Z[2]);
    X[3] = MLTM216(X[3],Z[3]);
-
-   /*
-   for (int i = 0; i < 4; i++) {
-      printf("S%d: %d\n",i,X[i]);
-   }
-   */
 
    /* recopy encryption results */
    memcpy(block,X,8);
