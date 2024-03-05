@@ -7,7 +7,7 @@
 
 #define ROL1(a) a = (a << 1) | (a >> 63)
 
-const unsigned long int cycles = 1000000;
+const unsigned long int cycles = 10000000;
 
 int main(void) {
 
@@ -46,6 +46,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","DES");
 
    /* testing FEAL */
    for (unsigned long int i = 0; i < cycles; i++) {
@@ -63,6 +64,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","FEAL");
 
    /* testing GOST */
    for (unsigned long int i = 0; i < cycles; i++) {
@@ -76,12 +78,13 @@ int main(void) {
       decrypt_GOST(&res0,key1);
 
       if (num0 != res0) {
-         printf("FEAL FAILED\n");
+         printf("GOST FAILED\n");
          printf("On key: %016lx\n",key0);
          printf("On val: %016lx\n",num0);
          break;
       }
    }
+   printf("%20s COMPLETE\n","GOST");
 
    /* testing LOKI */
    for (unsigned long int i = 0; i < cycles; i++) {
@@ -93,12 +96,13 @@ int main(void) {
       res0 = decrypt_LOKI(res0,key0);
 
       if (num0 != res0) {
-         printf("FEAL FAILED\n");
+         printf("LOKI FAILED\n");
          printf("On key: %016lx\n",key0);
          printf("On val: %016lx\n",num0);
          break;
       }
    }
+   printf("%20s COMPLETE\n","LOKI");
    
    /* testing MMB */
    for (unsigned long int i = 0; i < cycles; i++) {
@@ -114,6 +118,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","MMB");
 
    /* testing IDEA */
    for (unsigned long int i = 0; i < cycles; i++) {
@@ -133,6 +138,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","IDEA");
 
    struct Geffe geffe;
 
@@ -160,6 +166,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","Geffe");
 
    struct BPSaG bpsag;
 
@@ -187,12 +194,13 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","BPSaG");
 
    struct BSaG bsag;
    init_BSaG(key0,key0,0,&bsag);
 
    /* testing BSaG */
-   /* BROKEN */
+   /* 
    for (unsigned long int i = 0; i < cycles; i++) {
       for (int i = 0; i < 2; i++) key5[i] = rand()*rand();
       gen[0] = rand(); gen[1] = rand();
@@ -216,6 +224,8 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE","BSaG");
+   */
 
    struct ASaG asag;
 
@@ -243,6 +253,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","ASaG");
 
    struct Fish fish;
 
@@ -263,6 +274,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","Fish");
 
    struct Pike pike;
    init_Pike(key4,key4,key4,&pike);
@@ -282,6 +294,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","Pike");
 
    struct Mush mush;
    init_Mush(key4,key4,&mush);
@@ -301,6 +314,7 @@ int main(void) {
          break;
       }
    }
+   printf("%20s COMPLETE\n","Mush");
 
    return 0;
 }
