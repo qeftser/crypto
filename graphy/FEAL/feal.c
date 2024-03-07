@@ -79,12 +79,14 @@ uint64_t encrypt_FEAL(uint64_t block, uint64_t key) {
    process_key_FEAL(key,K);
 
    uint64_t bxor,exor;
-   memcpy(&bxor,((char *)&K)+8,4);
-   memcpy(&exor,((char *)&K)+12,4);
+
+   bxor = (K[8] << 24) | (K[9] << 16) | (K[10] << 8) | (K[11]);
+   exor = (K[12] << 24) | (K[13] << 16) | (K[14] << 8) | (K[15]);
 
    block ^= bxor;
-   memcpy(&L,((char *)&block),4);
-   memcpy(&R,((char *)&block)+4,4);
+
+   R = (block>>32)&0xffffffff;
+   L = block&0xffffffff;
 
    R ^= L;
    for (int i = 0; i < 7; i++) {
@@ -94,8 +96,10 @@ uint64_t encrypt_FEAL(uint64_t block, uint64_t key) {
    L ^= f_FEAL(R,K[7]);
    R ^= L;
 
-   memcpy(((char *)&block),&L,4);
-   memcpy(((char *)&block)+4,&R,4);
+   block = 0;
+   block |= R;
+   block <<= 32;
+   block |= L;
 
    block ^= exor;
 
@@ -108,12 +112,14 @@ uint64_t decrypt_FEAL(uint64_t block, uint64_t key) {
    process_key_FEAL(key,K);
 
    uint64_t bxor,exor;
-   memcpy(&bxor,((char *)&K)+8,4);
-   memcpy(&exor,((char *)&K)+12,4);
+
+   bxor = (K[8] << 24) | (K[9] << 16) | (K[10] << 8) | (K[11]);
+   exor = (K[12] << 24) | (K[13] << 16) | (K[14] << 8) | (K[15]);
 
    block ^= exor;
-   memcpy(&R,((char *)&block)+4,4);
-   memcpy(&L,((char *)&block),4);
+
+   R = (block>>32)&0xffffffff;
+   L = block&0xffffffff;
 
    R ^= L;
    for (int i = 0; i < 7; i++) {
@@ -123,8 +129,10 @@ uint64_t decrypt_FEAL(uint64_t block, uint64_t key) {
    L ^= f_FEAL(R,K[0]);
    R ^= L;
 
-   memcpy(((char *)&block),&L,4);
-   memcpy(((char *)&block)+4,&R,4);
+   block = 0;
+   block |= R;
+   block <<= 32;
+   block |= L;
 
    block ^= bxor;
 

@@ -35,4 +35,8 @@ struct Mush { uint8_t carry[2]; uint32_t A[56]; uint32_t B[56]; uint8_t I[2]; };
 void init_Mush(uint32_t *, uint32_t *, struct Mush *);
 uint32_t shift_Mush(struct Mush *);
 
+struct ORYX { uint64_t iteration; uint32_t X; uint32_t A; uint32_t B; }; 
+uint8_t shift_ORYX(struct ORYX *);
+void init_ORYX(uint32_t, uint32_t, uint32_t, uint64_t, struct ORYX *);
+
 #endif

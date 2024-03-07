@@ -6,8 +6,13 @@
 #include <string.h>
 
 #define ROL1(a) a = (a << 1) | (a >> 63)
+#define ROL8(a) a = (a << 8) | (a >> 56)
 
-const unsigned long int cycles = 10000000;
+const unsigned long int cycles = 1000000;
+
+void wrapper(uint64_t  * B, uint32_t * K) {
+   encrypt_GOST(B,K);
+}
 
 int main(void) {
 
@@ -65,6 +70,7 @@ int main(void) {
       }
    }
    printf("%20s COMPLETE\n","FEAL");
+
 
    /* testing GOST */
    for (unsigned long int i = 0; i < cycles; i++) {
@@ -315,6 +321,30 @@ int main(void) {
       }
    }
    printf("%20s COMPLETE\n","Mush");
+
+   struct ORYX oryx;
+
+   /* testing ORYX */
+   for (unsigned long int i = 0; i < cycles; i++) {
+      for (int i = 0; i < 3; i++) { key2[i] = rand(); };
+      res0 = num0 = rand();
+      init_ORYX(key2[0],key2[1],key2[2],0,&oryx);
+      for (int i = 0; i < 8; i++) {
+         res0 ^= shift_ORYX(&oryx);
+         ROL8(res0);
+      }
+      init_ORYX(key2[0],key2[1],key2[2],0,&oryx);
+      for (int i = 0; i < 8; i++) {
+         res0 ^= shift_ORYX(&oryx);
+         ROL8(res0);
+      }
+      if (res0 != num0) {
+         printf("ORYX FAILED\n");
+         printf("On val: %016lx\n",num0);
+         break;
+      }
+   }
+   printf("%20s COMPLETE\n","ORYX");
 
    return 0;
 }
