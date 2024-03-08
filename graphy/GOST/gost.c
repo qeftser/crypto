@@ -52,24 +52,6 @@ void encrypt_GOST(uint64_t *block, uint32_t *key) {
                                  0,1,2,3,4,5,6,7,7,6,5,4,3,2,1,0};
    uint32_t Rminus,L,R;
 
-   R = *block>>32;
-   L = *block&0xffffffff;
-
-   for (int i = 0; i < 32; i++) {
-      Rminus = R;
-      R = f_GOST(R,key[K[i]]);
-      ROL11(R) ^ L;
-      L = Rminus;
-   }
-
-   *block = ((uint64_t)R << 32) | (L);
-}
-
-void decrypt_GOST(uint64_t *block, uint32_t *key) {
-   static const uint8_t K[32] = {0,1,2,3,4,5,6,7,7,6,5,4,3,2,1,0,
-                                 7,6,5,4,3,2,1,0,7,6,5,4,3,2,1,0};
-   uint32_t Rminus,L,R;
-
    L = *block>>32;
    R = *block&0xffffffff;
 
@@ -79,7 +61,45 @@ void decrypt_GOST(uint64_t *block, uint32_t *key) {
       ROL11(R) ^ L;
       L = Rminus;
    }
-   
+
    *block = ((uint64_t)L << 32) | (R);
 }
 
+void decrypt_GOST(uint64_t *block, uint32_t *key) {
+   static const uint8_t K[32] = {0,1,2,3,4,5,6,7,7,6,5,4,3,2,1,0,
+                                 7,6,5,4,3,2,1,0,7,6,5,4,3,2,1,0};
+   uint32_t Rminus,L,R;
+
+   R = *block>>32;
+   L = *block&0xffffffff;
+
+   for (int i = 0; i < 32; i++) {
+      Rminus = R;
+      R = f_GOST(R,key[K[i]]);
+      ROL11(R) ^ L;
+      L = Rminus;
+   }
+   
+   *block = ((uint64_t)R << 32) | (L);
+}
+
+int main(void) {
+
+   uint32_t key[8] = { 0,0,0,0,0,0,0,0 };
+
+   uint64_t plain = 0xffffffffffffffff;
+
+   printf("Key: %08x %08x %08x %08x %08x %08x %08x %08x\n",key[0],key[1],key[2],key[3],key[4],key[5],key[6],key[7]);
+   printf("plain:    %016lx\n",plain);
+
+   encrypt_GOST(&plain,key);
+
+   printf("encrpted: %016lx\n",plain);
+
+   decrypt_GOST(&plain,key);
+
+   printf("decrpted: %016lx\n",plain);
+
+
+   return 0;
+}

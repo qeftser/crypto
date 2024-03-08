@@ -34,7 +34,7 @@ static void *GOST_thread(void *arg) {
 /* find GOST key with known plaintext */
 void crack_GOST(uint64_t plain_text, uint64_t cipher_text) {
 
-   const int threads = 4;
+   const int threads = 32;
    const int cpu_count = 8;
 
    struct GOST_block blocks[threads];

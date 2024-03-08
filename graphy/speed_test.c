@@ -11,7 +11,7 @@
 #define PRINT_RES(a) printf("%-10s|%11ld|   % 14.6f| % 18.6f|\n", \
                      names[a],cycles/encryption_size[a],times[a],((double)cycles/(8*1024))/times[a])
 
-const unsigned long int cycles = (long)MEGABYTE * ENCRYPTION_SIZE;
+const unsigned long int cycles = (long)MEGABYTE * ENCRYPTION_SIZE * 1024;
 
 int main(void) {
 
