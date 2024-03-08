@@ -135,19 +135,24 @@ void init_BSaG(uint64_t key1, uint64_t key2, uint64_t pre_shift, struct BSaG *b)
  *  ab[3] = b, ab[4] = b-1, ab[5] = b-2
  */
 uint8_t shift_BSaG(struct BSaG *b) {
-   static uint8_t clocked = 0;
+   static uint8_t D = 0;
    b->iteration = (b->iteration + 1) % ULONG_MAX;
-   b->ab[2] = b->ab[1];
-   b->ab[1] = b->ab[0];
-   b->ab[5] = b->ab[4];
-   b->ab[4] = b->ab[3];
-   if (!b->ab[4] || b->ab[5]) {
-      b->ab[3] = shift_LSFR64(&b->lsfr1);
-      clocked = 1;
-   } else clocked = 0;
-   if (!clocked && (b->ab[1] || !b->ab[2])) {
+
+   D = b->ab[1] && b->ab[2];
+   if (D) {
+      b->ab[5] = b->ab[4];
+      b->ab[4] = b->ab[3];
       b->ab[3] = shift_LSFR64(&b->lsfr2);
    }
+   if (!(D&&(!b->ab[4])&&b->ab[5])) {
+      b->ab[2] = b->ab[1];
+      b->ab[1] = b->ab[0];
+      b->ab[0] = shift_LSFR64(&b->lsfr1);
+   }
+   b->ab[2] = b->ab[1];
+   b->ab[1] = b->ab[0];
+   b->ab[0] = shift_LSFR64(&b->lsfr1);
+
    return b->ab[0] ^ b->ab[3];
 }
 
@@ -421,3 +426,19 @@ uint8_t shift_ORYX(struct ORYX *o) {
    return ((o->X&0xff)+(L[(o->A&0xf0)>>4][o->A&0x0f])+(L[(o->B&0xf0)>>4][o->B&0x0f])%256);
 }
 
+/*
+int main(void) {
+
+   struct BSaG bsag;
+   init_BSaG(0xfffff,0xfffff,0,&bsag);
+   for (int i = 0; i < 10000; i++) {
+      printf("%d",shift_BSaG(&bsag));
+      if (i % 100 == 0) putchar('\n');
+   }
+   putchar('\n');
+
+
+
+   return 0;
+}
+*/

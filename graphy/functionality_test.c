@@ -206,7 +206,6 @@ int main(void) {
    init_BSaG(key0,key0,0,&bsag);
 
    /* testing BSaG */
-   /* 
    for (unsigned long int i = 0; i < cycles; i++) {
       for (int i = 0; i < 2; i++) key5[i] = rand()*rand();
       gen[0] = rand(); gen[1] = rand();
@@ -230,8 +229,7 @@ int main(void) {
          break;
       }
    }
-   printf("%20s COMPLETE","BSaG");
-   */
+   printf("%20s COMPLETE\n","BSaG");
 
    struct ASaG asag;
 

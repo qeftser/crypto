@@ -83,6 +83,7 @@ void decrypt_GOST(uint64_t *block, uint32_t *key) {
    *block = ((uint64_t)R << 32) | (L);
 }
 
+/*
 int main(void) {
 
    uint32_t key[8] = { 0,0,0,0,0,0,0,0 };
@@ -103,3 +104,4 @@ int main(void) {
 
    return 0;
 }
+*/
