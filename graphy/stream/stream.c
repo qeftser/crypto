@@ -35,35 +35,33 @@ uint8_t shift_LSFR64(struct LSFR64 *lsfr) {
  * 
  * I have used three primitive polynomials that are relativly prime. 
  * They are:
- *    11 2
- *    18 5 2 1
- *    35 2
+ *    31 6
+ *    31 13
+ *    32 30 26 25
  * If you want the generator to be maximal length please limit the 
- * length in bits of your keys to 11, 18, and 35 respectivly.
+ * length in bits of your keys to 31, 31, and 32 respectivly.
  *********************************************************************/
 
 uint8_t shift_Geffe(struct Geffe *);
 void init_Geffe(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, struct Geffe *g) {
-   uint8_t k1[3]={2,11,2},k2[5]={4,18,5,2,1},k3[3]={2,35,2};
-   init_LSFR64(&g->lsfr1,k1);
-   init_LSFR64(&g->lsfr2,k2);
-   init_LSFR64(&g->lsfr3,k3);
    g->iteration = 0;
-   g->lsfr1.stream = key1;
-   g->lsfr2.stream = key2;
-   g->lsfr3.stream = key3;
+   g->stream1 = key1;
+   g->stream2 = key2;
+   g->stream3 = key3;
    for (unsigned long int i = 0; i < pre_shift; i++) {
       shift_Geffe(g);
    }
 }
 
 uint8_t shift_Geffe(struct Geffe *g) {
-   uint8_t a1,a2,a3;
    g->iteration = (g->iteration+1) % ULONG_MAX;
-   a1 = shift_LSFR64(&g->lsfr1);
-   a2 = shift_LSFR64(&g->lsfr2);
-   a3 = shift_LSFR64(&g->lsfr3);
-   return ((a1 & a2) ^ (((~ a1)&0x1) ^ a3));
+   g->stream1 = (((g->stream1>>5)^(g->stream1>>30))<<30)|
+                (g->stream1>>1);
+   g->stream2 = (((g->stream2>>12)^(g->stream2>>30))<<30)|
+                (g->stream2>>1);
+   g->stream3 = (((g->stream3>>24)^(g->stream3>>25)^(g->stream3>>29)^(g->stream3>>31))<<31)|
+                (g->stream3>>1);
+   return (((g->stream1&0x1) & (g->stream2&0x1)) ^ (((~ g->stream1)&0x1) ^ (g->stream3&0x1)));
 }
 
 /*********************************************************************
@@ -71,24 +69,20 @@ uint8_t shift_Geffe(struct Geffe *g) {
  * 
  * I have used three primitive polynomials that are relativly prime. 
  * They are:
- *    11 2
- *    18 5 2 1
- *    35 2
+ *    31 6
+ *    31 13
+ *    32 30 26 25
  * If you want the generator to be maximal length please limit the 
- * length in bits of your keys to 11, 18, and 35 respectivly.
+ * length in bits of your keys to 31, 31, and 32 respectivly.
  *********************************************************************/
 
 uint8_t shift_BPSaG(struct BPSaG *);
 void init_BPSaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, struct BPSaG *b) {
-   uint8_t k1[3]={2,11,2},k2[5]={4,18,5,2,1},k3[3]={2,35,2};
-   init_LSFR64(&b->lsfr1,k1);
-   init_LSFR64(&b->lsfr2,k2);
-   init_LSFR64(&b->lsfr3,k3);
    b->a[0]=0; b->a[1]=0; b->a[2]=0;
    b->iteration = 0;
-   b->lsfr1.stream = key1;
-   b->lsfr2.stream = key2;
-   b->lsfr3.stream = key3;
+   b->S1 = key1;
+   b->S2 = key2;
+   b->S3 = key3;
    for (unsigned long int i = 0; i < pre_shift; i++) {
       shift_BPSaG(b);
    }
@@ -97,10 +91,16 @@ void init_BPSaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift,
 uint8_t shift_BPSaG(struct BPSaG *b) {
    b->iteration = (b->iteration + 1) % ULONG_MAX;
    if (b->a[0]) {
-      b->a[1] = shift_LSFR64(&b->lsfr2);
+      b->S2 = (((b->S2>>12)^(b->S2>>30))<<30)|
+              (b->S2>>1);
+      b->a[1] = b->S2&0x1;
    }
-   b->a[0] = shift_LSFR64(&b->lsfr1);
-   b->a[2] = shift_LSFR64(&b->lsfr3);
+   b->S1 = (((b->S1>>5)^(b->S1>>30))<<30)|
+           (b->S1>>1);
+   b->S3 = (((b->S3>>24)^(b->S3>>25)^(b->S3>>29)^(b->S3>>31))<<31)|
+           (b->S3>>1);
+   b->a[0] = b->S1&0x1;
+   b->a[2] = b->S3&0x1;
    return b->a[1] ^ b->a[2];
 }
 
@@ -117,14 +117,11 @@ uint8_t shift_BPSaG(struct BPSaG *b) {
 
 uint8_t shift_BSaG(struct BSaG *);
 void init_BSaG(uint64_t key1, uint64_t key2, uint64_t pre_shift, struct BSaG *b) {
-   uint8_t k1[3]={2,49,9},k2[5]={4,50,4,3,2};
-   init_LSFR64(&b->lsfr1,k1);
-   init_LSFR64(&b->lsfr2,k2);
    b->ab[0] = 0; b->ab[1] = 0; b->ab[2] = 0;
    b->ab[3] = 0; b->ab[4] = 0; b->ab[5] = 0;
    b->iteration = 0;
-   b->lsfr1.stream = key1;
-   b->lsfr2.stream = key2;
+   b->S1 = key1;
+   b->S2 = key2;
    for (unsigned long int i = 0; i < pre_shift; i++) {
       shift_BSaG(b);
    }
@@ -142,16 +139,22 @@ uint8_t shift_BSaG(struct BSaG *b) {
    if (D) {
       b->ab[5] = b->ab[4];
       b->ab[4] = b->ab[3];
-      b->ab[3] = shift_LSFR64(&b->lsfr2);
+      b->S2 = (((b->S2>>1)^(b->S2>>2)^(b->S2>>3)^(b->S2>>49))<<49)|
+              (b->S2>>1);
+      b->ab[3] = b->S2&0x1;
    }
    if (!(D&&(!b->ab[4])&&b->ab[5])) {
       b->ab[2] = b->ab[1];
       b->ab[1] = b->ab[0];
-      b->ab[0] = shift_LSFR64(&b->lsfr1);
+      b->S1 = (((b->S1>>8)^(b->S1>>48))<<48)|
+              (b->S1>>1);
+      b->ab[0] = b->S1&0x1;
    }
    b->ab[2] = b->ab[1];
    b->ab[1] = b->ab[0];
-   b->ab[0] = shift_LSFR64(&b->lsfr1);
+   b->S1 = (((b->S1>>8)^(b->S1>>48))<<48)|
+           (b->S1>>1);
+   b->ab[0] = b->S1&0x1;
 
    return b->ab[0] ^ b->ab[3];
 }
@@ -161,24 +164,20 @@ uint8_t shift_BSaG(struct BSaG *b) {
  * 
  * I have used three primitive polynomials that are relativly prime. 
  * They are:
- *    2 4 1
+ *    64 4 3 2 1
  *    55 24
  *    63 1
  * If you want the generator to be maximal length please limit the 
- * length in bits of your keys to 41, 55, and 63 respectivly.
+ * length in bits of your keys to 64, 55, and 63 respectivly.
  *********************************************************************/
 
 uint8_t shift_ASaG(struct ASaG *);
 void init_ASaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, struct ASaG *a) {
-   uint8_t k1[3]={2,4,1},k2[3]={2,55,24},k3[3]={2,63,1};
-   init_LSFR64(&a->lsfr1,k1);
-   init_LSFR64(&a->lsfr2,k2);
-   init_LSFR64(&a->lsfr3,k3);
    a->bc[0] = 0; a->bc[1] = 0;
    a->iteration = 0;
-   a->lsfr1.stream = key1;
-   a->lsfr2.stream = key2;
-   a->lsfr3.stream = key3;
+   a->S1 = key1;
+   a->S2 = key2;
+   a->S3 = key3;
    for (unsigned long int i = 0; i < pre_shift; i++) {
       shift_ASaG(a);
    }
@@ -190,8 +189,18 @@ void init_ASaG(uint64_t key1, uint64_t key2, uint64_t key3, uint64_t pre_shift, 
  */
 uint8_t shift_ASaG(struct ASaG *a) {
    a->iteration = (a->iteration + 1) % ULONG_MAX;
-   if (shift_LSFR64(&a->lsfr1)) a->bc[0] = shift_LSFR64(&a->lsfr2);
-   else a->bc[1] = shift_LSFR64(&a->lsfr3);
+   a->S1 = ((a->S1^(a->S1>>1)^(a->S1>>2)^(a->S1>>3)^(a->S1>>63))<<63)|
+           (a->S1>>1);
+   if (a->S1&0x1) {
+      a->S2 = (((a->S2>>23)^(a->S2>>54))<<54)|
+              (a->S2>>1);
+      a->bc[0] = a->S2&0x1;
+   }
+   else {
+      a->S3 = (((a->S3>>62)^a->S3)<<62)|
+              (a->S3>1);
+      a->bc[1] = a->S3&0x1;
+   }
    return (a->bc[0] ^ a->bc[1]);
 }
 

@@ -7,19 +7,19 @@
 
 struct LSFR64 { uint64_t stream; uint8_t tap_num; uint8_t *taps; };
 
-struct Geffe { uint64_t iteration; struct LSFR64 lsfr1; struct LSFR64 lsfr2; struct LSFR64 lsfr3; };
+struct Geffe { uint64_t iteration; uint32_t stream1; uint32_t stream2; uint32_t stream3; };
 void init_Geffe(uint64_t, uint64_t, uint64_t, uint64_t, struct Geffe *);
 uint8_t shift_Geffe(struct Geffe *);
 
-struct BPSaG { uint8_t a[3]; uint64_t iteration; struct LSFR64 lsfr1; struct LSFR64 lsfr2; struct LSFR64 lsfr3;};
+struct BPSaG { uint8_t a[3]; uint64_t iteration; uint32_t S1; uint32_t S2; uint32_t S3; };
 void init_BPSaG(uint64_t, uint64_t, uint64_t, uint64_t, struct BPSaG *);
 uint8_t shift_BPSaG(struct BPSaG *);
 
-struct BSaG { uint8_t ab[6]; uint64_t iteration; struct LSFR64 lsfr1; struct LSFR64 lsfr2; };
+struct BSaG { uint8_t ab[6]; uint64_t iteration; uint64_t S1; uint64_t S2; };
 void init_BSaG(uint64_t, uint64_t, uint64_t, struct BSaG *);
 uint8_t shift_BSaG(struct BSaG *);
 
-struct ASaG { uint8_t bc[2]; uint64_t iteration; struct LSFR64 lsfr1; struct LSFR64 lsfr2; struct LSFR64 lsfr3;};
+struct ASaG { uint8_t bc[2]; uint64_t iteration; uint64_t S1; uint64_t S2; uint64_t S3; };
 void init_ASaG(uint64_t, uint64_t, uint64_t, uint64_t, struct ASaG *);
 uint8_t shift_ASaG(struct ASaG *);
 
