@@ -10,24 +10,24 @@
 #define Hnl(x,y,z) (x ^ y ^ z)
 #define Inl(x,y,z) (y ^ (x | (~ z)))
 
-uint32_t ROL(uint8_t s, uint32_t a) {
+uint32_t ROL_MD5(uint8_t s, uint32_t a) {
    return ((a << s) | (a >> (32-s)));
 }
 
 void FF_MD5(uint32_t * a, uint32_t b, uint32_t c, uint32_t d, uint32_t M, uint32_t s, uint32_t t) {
-   *a = b + ROL(s,(*a + Fnl(b,c,d) + M + t));
+   *a = b + ROL_MD5(s,(*a + Fnl(b,c,d) + M + t));
 }
 
 void GG_MD5(uint32_t * a, uint32_t b, uint32_t c, uint32_t d, uint32_t M, uint32_t s, uint32_t t) {
-   *a = b + ROL(s,(*a + Gnl(b,c,d) + M + t));
+   *a = b + ROL_MD5(s,(*a + Gnl(b,c,d) + M + t));
 }
 
 void HH_MD5(uint32_t * a, uint32_t b, uint32_t c, uint32_t d, uint32_t M, uint32_t s, uint32_t t) {
-   *a = b + ROL(s,(*a + Hnl(b,c,d) + M + t));
+   *a = b + ROL_MD5(s,(*a + Hnl(b,c,d) + M + t));
 }
 
 void II_MD5(uint32_t * a, uint32_t b, uint32_t c, uint32_t d, uint32_t M, uint32_t s, uint32_t t) {
-   *a = b + ROL(s,(*a + Inl(b,c,d) + M + t));
+   *a = b + ROL_MD5(s,(*a + Inl(b,c,d) + M + t));
 }
 
 void loop_MD5(uint32_t * V, uint32_t * M) {
@@ -155,6 +155,7 @@ void MD5(uint64_t * out, uint8_t * msg, uint64_t msg_len) {
    memcpy(out,ABCD,16);
 }
 
+/*
 int main(void) {
 
    long int count = INT_MAX;
@@ -175,3 +176,4 @@ int main(void) {
 
    return 0;
 }
+*/

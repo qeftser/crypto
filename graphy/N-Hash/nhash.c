@@ -116,6 +116,7 @@ void N_Hash(uint64_t * out, uint8_t * msg, uint64_t msg_len) {
    }
 }
 
+/*
 int main(void) {
 
    int size = INT_MAX;
@@ -137,4 +138,4 @@ int main(void) {
 
 }
 
-
+*/

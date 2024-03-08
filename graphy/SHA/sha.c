@@ -9,27 +9,27 @@
 #define F2SHA(x,y,z) (x ^ y ^ z)
 #define F3SHA(x,y,z) ((x & y) | (x & z) | (y & z))
 
-uint32_t ROL(uint8_t s, uint32_t a) {
+uint32_t ROL_SHA(uint8_t s, uint32_t a) {
    return ((a << s) | (a >> (32-s)));
 }
 
 void cycle_SHA(uint32_t * V, uint32_t W, uint8_t i) {
    uint32_t temp;
    if (i < 20) {
-      temp = ROL(V[5],5) + F1SHA(V[6],V[7],V[8]) + V[9] + W + 0x5a827999;
+      temp = ROL_SHA(V[5],5) + F1SHA(V[6],V[7],V[8]) + V[9] + W + 0x5a827999;
    }
    else if (i < 40) {
-      temp = ROL(V[5],5) + F2SHA(V[6],V[7],V[8]) + V[9] + W + 0x6ed9eba1;
+      temp = ROL_SHA(V[5],5) + F2SHA(V[6],V[7],V[8]) + V[9] + W + 0x6ed9eba1;
    }
    else if (i < 60) {
-      temp = ROL(V[5],5) + F3SHA(V[6],V[7],V[8]) + V[9] + W + 0x8f1bbcdc;
+      temp = ROL_SHA(V[5],5) + F3SHA(V[6],V[7],V[8]) + V[9] + W + 0x8f1bbcdc;
    }
    else {
-      temp = ROL(V[5],5) + F2SHA(V[6],V[7],V[8]) + V[9] + W + 0xca62c1d6;
+      temp = ROL_SHA(V[5],5) + F2SHA(V[6],V[7],V[8]) + V[9] + W + 0xca62c1d6;
    }
    V[9] = V[8];
    V[8] = V[7];
-   V[7] = ROL(V[6],30);
+   V[7] = ROL_SHA(V[6],30);
    V[6] = V[5];
    V[5] = temp;
 }
@@ -40,7 +40,7 @@ void generate_W_SHA(uint32_t * W, uint32_t * M) {
       W[i] = M[i];
    }
    for (; i < 80; i++) {
-      W[i] = ROL(1,(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16]));
+      W[i] = ROL_SHA(1,(W[i-3] ^ W[i-8] ^ W[i-14] ^ W[i-16]));
    }
 }
 
@@ -58,6 +58,7 @@ void SHA(uint32_t * out, uint8_t * msg, uint64_t msg_len) {
    ABCDE[4] = 0xc3d2e1f0;
 
    while (msg_len >= 64) {
+      memcpy(ABCDE+5,ABCDE,20);
       memcpy(M,msg,64);
       generate_W_SHA(W,M);
       msg+=64; msg_len-=64;
@@ -77,6 +78,7 @@ void SHA(uint32_t * out, uint8_t * msg, uint64_t msg_len) {
       for (; i < 64; i++) {
          padded[i] = 0x0;
       }
+      memcpy(ABCDE+5,ABCDE,20);
       memcpy(M,padded,64);
       generate_W_SHA(W,M);
       msg+=64; msg_len-=64;
@@ -88,6 +90,7 @@ void SHA(uint32_t * out, uint8_t * msg, uint64_t msg_len) {
       for (i = 0; i < 60; i++) {
          padded[i] = 0x0;
       }
+      memcpy(ABCDE+5,ABCDE,20);
       memcpy(padded+60,&og_len,4);
       memcpy(M,padded,64);
       generate_W_SHA(W,M);
@@ -107,6 +110,7 @@ void SHA(uint32_t * out, uint8_t * msg, uint64_t msg_len) {
       for (; i < 60; i++) {
          padded[i] = 0x0;
       }
+      memcpy(ABCDE+5,ABCDE,20);
       memcpy(padded+60,&og_len,4);
       memcpy(M,padded,64);
       generate_W_SHA(W,M);
@@ -121,6 +125,7 @@ void SHA(uint32_t * out, uint8_t * msg, uint64_t msg_len) {
    memcpy(out,ABCDE,20);
 }
 
+/*
 int main(void) {
 
    long int count = INT_MAX;
@@ -140,3 +145,4 @@ int main(void) {
 
    return 0;
 }
+*/
