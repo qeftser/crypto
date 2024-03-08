@@ -5,24 +5,28 @@
 #include <time.h>
 
 #define MEGABYTE 1024 * 1024 * 8
-#define ENCRYPTION_SIZE 10
-#define TOTAL_CIPHERS 13
+#define ENCRYPTION_SIZE 1024
+#define TOTAL_CIPHERS 18
 
 #define PRINT_RES(a) printf("%-10s|%11ld|   % 14.6f| % 18.6f|\n", \
                      names[a],cycles/encryption_size[a],times[a],((double)cycles/(8*1024))/times[a])
 
-const unsigned long int cycles = (long)MEGABYTE * ENCRYPTION_SIZE * 1024;
+const unsigned long int cycles = (long)MEGABYTE * ENCRYPTION_SIZE;
 
 int main(void) {
 
    double times[TOTAL_CIPHERS];
    char *names[TOTAL_CIPHERS] = { "DES", "FEAL", "GOST", "LOKI", "MMB", "IDEA", 
-                                  "Geffe", "BPSaG", "BSaG", "ASaG", "Fish", "Pike", "Mush" };
-   uint16_t encryption_size[TOTAL_CIPHERS] = { 64, 64, 64, 64, 128, 64, 1, 1, 1, 1, 64, 32, 32 };
+                                  "Geffe", "BPSaG", "BSaG", "ASaG", "Fish", "Pike", 
+                                  "Mush", "ORYX", "MD5", "N_Hash", "SHA", "HAVAL" };
+   uint16_t encryption_size[TOTAL_CIPHERS] = { 64, 64, 64, 64, 128, 64, 1, 1, 1, 1, 
+                                               64, 32, 32, 8, 128, 512, 512, 1024 };
 
    uint64_t num = 0x0123456789abcdef;
    uint32_t num1[4] = { 0x0123, 0x4567, 0x89ab, 0xcdef };
    uint32_t numA, numB;
+   uint64_t num4[4];
+   uint32_t num5[5];
 
    uint64_t key0 = 0x123456789abcdef;
    uint32_t key1[8] = { 0x1234, 0x5678, 0x9abc, 0xdef0, 0x0123, 0x4567, 0x89ab, 0xcdef };
@@ -30,6 +34,11 @@ int main(void) {
    uint64_t key3[2] = { 0x0123456789abcdef, 0x012345689abcdef };
    uint32_t key4[60] = { 1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,
                          4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6,7,8,9,1,2,3,4,5,6};
+   uint8_t * key5;
+   key5 = malloc(sizeof(char)*(cycles/8));
+   for (unsigned long int i = 0; i < cycles/8; i++) {
+      key5[i] = rand();
+   }
 
 
    clock_t sClock;
@@ -170,7 +179,43 @@ int main(void) {
    times[12] = (double)(clock() - sClock) / CLOCKS_PER_SEC;
    PRINT_RES(12);
 
-   num ^= num1[0] ^ num1[1] ^ num1[2] ^ num1[3];
+   struct ORYX oryx;
+   init_ORYX(key1[0],key1[1],key1[2],0,&oryx);
+
+   /* testing ORYX */
+   sClock = clock();
+   for (unsigned long int i = 0; i < cycles / encryption_size[13]; i++) {
+      num ^= shift_ORYX(&oryx);
+   }
+   times[13] = (double)(clock() - sClock) / CLOCKS_PER_SEC;
+   PRINT_RES(13);
+
+   /* testing MD5 */
+   sClock = clock();
+   MD5(num4,key5,cycles/8);
+   times[14] = (double)(clock() - sClock) / CLOCKS_PER_SEC;
+   PRINT_RES(14);
+
+   /* testing N-Hash */
+   sClock = clock();
+   N_Hash(num4,key5,cycles/8);
+   times[15] = (double)(clock() - sClock) / CLOCKS_PER_SEC;
+   PRINT_RES(15);
+
+   /* testing SHA */
+   sClock = clock();
+   SHA(num5,key5,cycles/8);
+   times[16] = (double)(clock() - sClock) / CLOCKS_PER_SEC;
+   PRINT_RES(16);
+
+   /* testing HAVAL */
+   sClock = clock();
+   HAVAL(num4,key5,cycles/8);
+   times[17] = (double)(clock() - sClock) / CLOCKS_PER_SEC;
+   PRINT_RES(17);
+
+   num ^= num1[0] ^ num1[1] ^ num1[2] ^ num1[3] ^ num4[0] ^ num4[1] ^ num4[2] ^ num4[3] ^
+          num5[0] ^ num5[1] ^ num5[2] ^ num5[3] ^ num5[4];
    printf("\n\nGARBAGE: %lu\n",num);
 
    return 0;

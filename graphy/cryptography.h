@@ -5,6 +5,8 @@
 #include <stdint.h>
 #include "./stream/stream.h"
 
+/* BLOCK CIPHERS */
+
 uint64_t encrypt_DES(uint64_t, uint64_t);
 uint64_t decrypt_DES(uint64_t, uint64_t);
 
@@ -22,6 +24,8 @@ void decrypt_MMB(uint32_t *, uint32_t *);
 
 void encrypt_IDEA(uint64_t *, uint64_t *);
 void decrypt_IDEA(uint64_t *, uint64_t *);
+
+/* STREAM CIPHERS */
 
 struct Geffe;
 void init_Geffe(uint64_t, uint64_t, uint64_t, uint64_t, struct Geffe *);
@@ -50,5 +54,20 @@ uint32_t shift_Pike(struct Pike *);
 struct Mush;
 void init_Mush(uint32_t *, uint32_t *, struct Mush *);
 uint32_t shift_Mush(struct Mush *);
+
+struct ORYX;
+uint8_t shift_ORYX(struct ORYX *);
+void init_ORYX(uint32_t, uint32_t, uint32_t, uint64_t, struct ORYX *);
+
+/* ONE-WAY HASHES */
+
+void MD5(uint64_t *, uint8_t *, uint64_t);
+
+void N_Hash(uint64_t *, uint8_t *, uint64_t);
+
+void SHA(uint32_t *, uint8_t *, uint64_t);
+
+void HAVAL(uint64_t *, uint8_t *, uint64_t);
+
 
 #endif

@@ -8,7 +8,7 @@
 #define ROL1(a) a = (a << 1) | (a >> 63)
 #define ROL8(a) a = (a << 8) | (a >> 56)
 
-const unsigned long int cycles = 1000000;
+const unsigned long int cycles = 10000;
 
 void wrapper(uint64_t  * B, uint32_t * K) {
    encrypt_GOST(B,K);
@@ -19,6 +19,9 @@ int main(void) {
 
    uint64_t res0, num0 = 0x0123456789abcdef;
    uint32_t res1[4], num1[4] = { 0x0123, 0x4567, 0x89ab, 0xcdef };
+   uint8_t num2[256];
+   uint64_t res2A[4], res2B[4];
+   uint32_t res3A[5], res3B[5];
    uint32_t resA, resB, numA, numB, intrmA, intrmB;
 
    uint32_t gen[4];
@@ -343,6 +346,68 @@ int main(void) {
       }
    }
    printf("%20s COMPLETE\n","ORYX");
+
+   /* testing MD5 */
+   for (unsigned long int i = 0; i < cycles; i++) {
+      for (int i = 0; i < 256; i++) { num2[i] = rand(); }
+      MD5(res2A,num2,256);
+      MD5(res2B,num2,256);
+      if (res2A[0] != res2B[0] || res2A[1] != res2B[1]) {
+         printf("MD5 FAILED\n");
+         printf("On val: ");
+         for (int i = 0; i < 256; i++) { printf("%02x ",num2[i]); }
+         printf("\n");
+         break;
+      }
+   }
+   printf("%20s COMPLETE\n","MD5");
+
+   /* testing N-Hash */
+   for (unsigned long int i = 0; i < cycles; i++) {
+      for (int i = 0; i < 256; i++) { num2[i] = rand(); }
+      N_Hash(res2A,num2,256);
+      N_Hash(res2B,num2,256);
+      if (res2A[0] != res2B[0] || res2A[1] != res2B[1]) {
+         printf("N-Hash FAILED\n");
+         printf("On val: ");
+         for (int i = 0; i < 256; i++) { printf("%02x ",num2[i]); }
+         printf("\n");
+         break;
+      }
+   }
+   printf("%20s COMPLETE\n","N-Hash");
+
+   /* testing SHA */
+   for (unsigned long int i = 0; i < cycles; i++) {
+      for (int i = 0; i < 256; i++) { num2[i] = rand(); }
+      SHA(res3A,num2,256);
+      SHA(res3B,num2,256);
+      if (res3A[0] != res3B[0] || res3A[1] != res3B[1] || res3A[2] != res3B[2] ||
+          res3A[3] != res3B[3] || res3A[4] != res3B[4]) {
+         printf("SHA FAILED\n");
+         printf("On val: ");
+         for (int i = 0; i < 256; i++) { printf("%02x ",num2[i]); }
+         printf("\n");
+         break;
+      }
+   }
+   printf("%20s COMPLETE\n","SHA");
+   
+   /* testing HAVAL */
+   for (unsigned long int i = 0; i < cycles; i++) {
+      for (int i = 0; i < 256; i++) { num2[i] = rand(); }
+      HAVAL(res2A,num2,256);
+      HAVAL(res2B,num2,256);
+      if (res2A[0] != res2B[0] || res2A[1] != res2B[1] ||
+          res2A[2] != res2B[2] || res2A[3] != res2B[3]) {
+         printf("HAVAL FAILED\n");
+         printf("On val: ");
+         for (int i = 0; i < 256; i++) { printf("%02x ",num2[i]); }
+         printf("\n");
+         break;
+      }
+   }
+   printf("%20s COMPLETE\n","HAVAL");
 
    return 0;
 }

@@ -8,7 +8,7 @@ CC_FLAGS := -g -O3 -Wall -Wextra -Wpedantic -mavx2 -mfma -mcx16
 LD_FLAGS := -lm -lpthread -O3
 
 HEADERS := ./graphy/cryptography.h ./graphy/stream/stream.h ./graphy/bits.h ./analysis/brute-force/brute_force.h
-FILES := ./graphy/DES/des.c ./graphy/FEAL/feal.c ./graphy/GOST/gost.c ./graphy/IDEA/idea.c ./graphy/LOKI91/loki.c ./graphy/MMB/mmb.c ./graphy/stream/stream.c ./analysis/brute-force/brute_force.c
+FILES := ./graphy/DES/des.c ./graphy/FEAL/feal.c ./graphy/GOST/gost.c ./graphy/IDEA/idea.c ./graphy/LOKI91/loki.c ./graphy/MMB/mmb.c ./graphy/stream/stream.c ./analysis/brute-force/brute_force.c ./graphy/MD5/md5.c ./graphy/SHA/sha.c ./graphy/N-Hash/nhash.c ./graphy/HAVAL/haval.c
 
 # build benchmarks
 clock:
