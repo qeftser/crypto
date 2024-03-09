@@ -30,13 +30,6 @@ uint32_t O(uint32_t r, uint32_t c, uint16_t P) {
    return accum/val;
 }
 
-/*
-void binary_print(uint32_t in) {
-   for (int i = 31; i >= 0; i--) {
-      if (in & BIT[i]) putchar('1'); else putchar('0');
-   }
-}
-*/
 
 uint32_t s_box(uint64_t R) {
    uint16_t P[16] =    { 375, 379, 391, 395, 397, 415, 419, 425,
