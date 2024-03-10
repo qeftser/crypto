@@ -51,7 +51,7 @@ int main(void) {
           ENCRYPTION_SIZE,(double)ENCRYPTION_SIZE/1024);
 
    printf("Cipher    |    Cycles |            Time |            KB/Sec |\n");
-   printf("-------------------------------------------------------------\n");
+   printf("----------|-----------|-----------------|-------------------|\n");
 
    /* testing DES */
    sClock = clock();

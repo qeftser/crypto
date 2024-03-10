@@ -5,21 +5,21 @@
 
 #define swap(a,b) temp = b; b = a; a = temp
 
-uint8_t s0_FEAL(uint8_t x1, uint8_t x2) {
+inline uint8_t s0_FEAL(uint8_t x1, uint8_t x2) {
    uint16_t cx1 = (uint16_t) x1;
    uint8_t Y = (uint8_t) ((cx1+x2) % 256);
    Y = (Y << 2) | (Y >> 6);
    return Y;
 }
 
-uint8_t s1_FEAL(uint8_t x1, uint8_t x2) {
+inline uint8_t s1_FEAL(uint8_t x1, uint8_t x2) {
    uint16_t cx1 = (uint16_t) x1;
    uint8_t Y = (uint8_t) ((cx1+x2+1) % 256);
    Y = (Y << 2) | (Y >> 6);
    return Y;
 }
 
-void fk_FEAL(uint32_t *A, uint32_t B, uint16_t *K1, uint16_t *K2) {
+inline void fk_FEAL(uint32_t *A, uint32_t B, uint16_t *K1, uint16_t *K2) {
    uint8_t a[4],b[4],Y[4];
    memcpy(a,A,4);
    memcpy(b,&B,4);
@@ -39,7 +39,7 @@ void fk_FEAL(uint32_t *A, uint32_t B, uint16_t *K1, uint16_t *K2) {
    memcpy(K2,((char *)(Y))+2,2);
 }
 
-uint32_t f_FEAL(uint32_t A, uint16_t B) {
+inline uint32_t f_FEAL(uint32_t A, uint16_t B) {
    uint8_t a[4],b[2],Y[4];
    memcpy(a,&A,4);
    memcpy(b,&B,2);
@@ -55,7 +55,7 @@ uint32_t f_FEAL(uint32_t A, uint16_t B) {
    return out;
 }
 
-uint16_t * process_key_FEAL(uint64_t key, uint16_t * keys) {
+inline uint16_t * process_key_FEAL(uint64_t key, uint16_t * keys) {
    uint32_t temp,A,B,D[8];
    memcpy(&A,&key,4);
    memcpy(&B,((char *)&key)+4,4);

@@ -41,4 +41,21 @@ int main(int argc, char **argv) {
       }
       printf("\n");
    }
+   else if (strcmp("DES",argv[1]) == 0) {
+      uint64_t key;
+      uint64_t plain = 0x1234;
+      uint64_t cipher;
+      printf("Generating random key: ");
+      uint32_t K1, K2;
+      K1 = rand();
+      K2 = rand();
+      key = K1 | (uint64_t)K2<<32;
+      printf("%016lx\n",key);
+      cipher = encrypt_DES(plain,key);
+      printf("Using known plaintext: %016lx\n",plain);
+      printf("With ciphertext:       %016lx\n",cipher);
+      printf("\n\n");
+      printf("Brute forcing...\n");
+      crack_DES(plain,cipher);
+   }
 }

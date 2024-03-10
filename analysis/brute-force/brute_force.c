@@ -30,11 +30,25 @@ static void *GOST_thread(void *arg) {
    return (void *)-1;
 }
 
+struct DES_block { uint64_t Ks; uint64_t Ke; uint64_t P; uint64_t C; };
+static void *DES_thread(void *arg) {
+   struct DES_block *block = arg;
+   uint64_t cc;
+   for (uint64_t i = block->Ks; i < block->Ke; i++) {
+      cc = encrypt_DES(block->P,i);
+      if (cc == block->C) {
+         printf("Found Key: %016lx\n",i);
+         exit(0);
+      }
+   }
+   return (void *)-1;
+}
+
 /* GOST */
 /* find GOST key with known plaintext */
 void crack_GOST(uint64_t plain_text, uint64_t cipher_text) {
 
-   const int threads = 4;
+   const int threads = 8;
    const int cpu_count = 8;
 
    struct GOST_block blocks[threads];
@@ -86,5 +100,47 @@ void crack_GOST(uint64_t plain_text, uint64_t cipher_text) {
    }
    }
    }
+   }
+}
+
+/* DES */
+/* find DES key with single known plaintext */
+void crack_DES(uint64_t plain_text, uint64_t cipher_text) {
+
+   const int threads = 8;
+   const int cpu_count = 8;
+   const uint64_t step = 2097152;
+
+   struct DES_block blocks[threads];
+   pthread_t DES_threads[threads];
+   pthread_attr_t attr;
+   cpu_set_t cpu_set;
+   void * res = 0;
+
+   /* thread setup */
+   pthread_attr_init(&attr);
+   pthread_attr_setstacksize(&attr,256);
+   pthread_attr_setguardsize(&attr,0);
+
+   for (int i = 0; i < threads; i++) {
+      blocks[i].P = plain_text;
+      blocks[i].C = cipher_text;
+   }
+
+   for (uint64_t D = 0; D+step-1 < 36028797018963968; D+=step) {
+      for (int T = 0; T < threads; T++) {
+         printf("[ %016lx - %016lx ]\n",D+(step*T),D+(step*(T+1)));
+         blocks[T].Ks = D+(step*T);
+         blocks[T].Ke = D+(step*(T+1));
+         CPU_ZERO(&cpu_set);
+         CPU_SET(T%cpu_count,&cpu_set);
+         pthread_attr_setaffinity_np(&attr,sizeof(cpu_set_t),&cpu_set);
+         pthread_create(&DES_threads[T],&attr,DES_thread,&blocks[T]);
+      }
+
+      for (int i = 0; i < threads; i++) {
+         pthread_join(DES_threads[i],res);
+         free(res);
+      }
    }
 }
