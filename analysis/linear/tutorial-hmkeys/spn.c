@@ -1,10 +1,3 @@
-/* This freaking thing is based and urealisitic I threw my compter into the wall so 
- * many times that the wall broke into pieces and is all over the floor. My computer
- * still won't break just like this stupid cipher. I am convinced at this point
- * that something is written wrong here becuase it is not working when it should
- * I have checked it like twenty times and still nothing it is absurd 
- */
-
 
 #include <stdint.h>
 #include <stdio.h>
