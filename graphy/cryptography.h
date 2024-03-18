@@ -25,6 +25,10 @@ void decrypt_MMB(uint32_t *, uint32_t *);
 void encrypt_IDEA(uint64_t *, uint64_t *);
 void decrypt_IDEA(uint64_t *, uint64_t *);
 
+void generate_keys_AES(uint32_t * k, uint32_t * w);
+void encrypt_AES(uint32_t * block, uint32_t * w);
+void decrypt_AES(uint32_t * block, uint32_t * w);
+
 /* STREAM CIPHERS */
 
 struct Geffe;

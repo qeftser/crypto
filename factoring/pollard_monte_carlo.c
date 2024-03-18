@@ -32,6 +32,7 @@ int64_t pollard_monte_carlo(uint64_t n) {
    else return d;
 }
 
+/*
 int main(void) {
 
    uint64_t n = 10403;
@@ -43,3 +44,4 @@ int main(void) {
 
    return 0;
 }
+*/

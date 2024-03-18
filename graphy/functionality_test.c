@@ -149,6 +149,25 @@ int main(void) {
    }
    printf("%20s COMPLETE\n","IDEA");
 
+   /* testing AES */
+   for (unsigned long int i = 0; i < cycles; i++) {
+      for (int i = 0; i < 8; i++) key1[i] = rand();
+      for (int i = 0; i < 4; i++) num1[i] = res1[i] = rand();
+      generate_keys_AES(key1,key7);
+      encrypt_AES(num1,key7);
+      decrypt_AES(num1,key7);
+      if (num1[0] != res1[0] ||
+          num1[1] != res1[1] ||
+          num1[2] != res1[2] ||
+          num1[3] != res1[3]) {
+         printf("AES FAILED\n");
+         printf("On key: %08x %08x %08x %08x\n",key1[0],key1[1],key1[2],key1[3]);
+         printf("On val: %08x %08x %08x %08x\n",num1[0],num1[1],num1[2],num1[3]);
+         break;
+      }
+   }
+   printf("%20s COMPLETE\n","AES");
+
    struct Geffe geffe;
 
    /* testing Geffe */

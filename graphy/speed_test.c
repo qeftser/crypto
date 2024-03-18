@@ -6,7 +6,7 @@
 
 #define MEGABYTE 1024 * 1024 * 8
 #define ENCRYPTION_SIZE 1024
-#define TOTAL_CIPHERS 18
+#define TOTAL_CIPHERS 19
 
 #define PRINT_RES(a) printf("%-10s|%11ld|   % 14.6f| % 18.6f|\n", \
                      names[a],cycles/encryption_size[a],times[a],((double)cycles/(8*1024))/times[a])
@@ -18,9 +18,10 @@ int main(void) {
    double times[TOTAL_CIPHERS];
    char *names[TOTAL_CIPHERS] = { "DES", "FEAL", "GOST", "LOKI", "MMB", "IDEA", 
                                   "Geffe", "BPSaG", "BSaG", "ASaG", "Fish", "Pike", 
-                                  "Mush", "ORYX", "MD5", "N_Hash", "SHA", "HAVAL" };
+                                  "Mush", "ORYX", "MD5", "N_Hash", "SHA", "HAVAL",
+                                  "AES" };
    uint16_t encryption_size[TOTAL_CIPHERS] = { 64, 64, 64, 64, 128, 64, 1, 1, 1, 1, 
-                                               64, 32, 32, 8, 128, 512, 512, 1024 };
+                                               64, 32, 32, 8, 128, 512, 512, 1024, 128 };
 
    uint64_t num = 0x0123456789abcdef;
    uint32_t num1[4] = { 0x0123, 0x4567, 0x89ab, 0xcdef };
@@ -213,6 +214,15 @@ int main(void) {
    HAVAL(num4,key5,cycles/8);
    times[17] = (double)(clock() - sClock) / CLOCKS_PER_SEC;
    PRINT_RES(17);
+
+   /* testing AES */
+   sClock = clock();
+   generate_keys_AES(key1,key4);
+   for (unsigned long int i = 0; i < cycles / encryption_size[18]; i++) {
+      encrypt_AES(num1,key4);
+   }
+   times[18] = (double)(clock() - sClock) / CLOCKS_PER_SEC;
+   PRINT_RES(18);
 
    num ^= num1[0] ^ num1[1] ^ num1[2] ^ num1[3] ^ num4[0] ^ num4[1] ^ num4[2] ^ num4[3] ^
           num5[0] ^ num5[1] ^ num5[2] ^ num5[3] ^ num5[4];

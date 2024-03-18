@@ -144,8 +144,8 @@ uint64_t operate_DES(uint64_t block, uint64_t key, uint8_t e_d) {
    }
 
    /* get left and right blocks */
-   memcpy(&lft_b, (char *) &block_t, 4);
-   memcpy(&rht_b, ((char *) &block_t)+4, 4);
+   lft_b = (block_t&0xffffffff00000000)>>32;
+   rht_b = (block_t&0x00000000ffffffff);
 
    /* key permutation */
    for (int i = 0; i < 56; i++) {
@@ -257,8 +257,7 @@ uint64_t operate_DES(uint64_t block, uint64_t key, uint8_t e_d) {
    }
 
    /* write to block */
-   memcpy(&block_t,&lft_b,4);
-   memcpy(((char *)&block_t)+4,&rht_b,4);
+   block = (uint64_t)lft_b<<32|rht_b;
 
    /* final permutation */
    block = 0;
