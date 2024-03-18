@@ -140,5 +140,16 @@ int main(void) {
    if (al->elements != 16) printf("fail<0> ");
    printf("COMPLETE\n");
 
+   uint64_t expected[20] = {0,0,1,1,2,2,3,3,4,4,
+                            5,5,6,6,7,7,8,8,9,9};
+   RESET();
+   printf("TESTING sort_al = ");
+   sort_al(al);
+   for (int i = 0; i < 20; i++) {
+      if (expected[i] != al->list[i]) printf("fail<%d> ",i);
+   }
+   printf("COMPLETE\n");
+
+
    return 0;
 }

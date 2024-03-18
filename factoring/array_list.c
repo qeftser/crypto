@@ -207,3 +207,50 @@ void fast_rem_all_below_element_al(uint64_t cutoff, struct array_list *al) {
    free(new_al);
 }
 
+void insertion_sort_al(uint64_t l, uint64_t h, uint64_t * A) {
+   uint64_t bi,bv,t;
+   for (uint64_t i = l; i < h; i++) {
+      bv = A[i]; bi = i;
+      for (uint64_t j = i+1; j <= h; j++) {
+         if (A[j] < bv) {
+            bv = A[j]; bi = j;
+         }
+      }
+      t = A[i]; A[i] = A[bi]; A[bi] = t;
+   }
+}
+
+void quicksort_al(uint64_t l, uint64_t h, uint64_t * A) {
+   if (l >= h || l < 0) return;
+   
+   if (h-l < 16) {
+      insertion_sort_al(l,h,A);
+   }
+   else {
+      uint64_t pivot = partition_al(l,h,A);
+
+      quicksort_al(l,pivot-1,A);
+      quicksort_al(pivot+1,h,A);
+   }
+}
+
+
+uint64_t partition_al(uint64_t l, uint64_t h, uint64_t * A) {
+   uint64_t p = A[h];
+   uint64_t i,j,t;
+   i = l-1;
+   for (j = l; j < h; j++) {
+      if (A[j] <= p) {
+         i++;
+         t = A[i]; A[i] = A[j]; A[j] = t;
+      }
+   }
+   i++;
+   t = A[i]; A[i] = A[h]; A[h] = t;
+   return i;
+}
+
+void sort_al(struct array_list * al) {
+   quicksort_al(al->head,al->rear-1,al->list);
+}
+

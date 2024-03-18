@@ -42,4 +42,12 @@ void fast_rem_all_below_element_al(uint64_t, struct array_list *);
 
 void replace_all_element_al(uint64_t, uint64_t, struct array_list *);
 
+void insertion_sort_al(uint64_t, uint64_t, uint64_t *);
+
+uint64_t partition_al(uint64_t, uint64_t, uint64_t *);
+
+void quicksort_al(uint64_t, uint64_t, uint64_t *);
+
+void sort_al(struct array_list *);
+
 #endif
