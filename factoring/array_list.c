@@ -132,6 +132,9 @@ void fast_rem_all_element_al(AL_TYPE element, struct array_list *al) {
    }
    free(al->list);
    al->list = new_al->list;
+   al->elements = new_al->elements;
+   al->rear = new_al->rear;
+   al->head = 0;
    free(new_al);
 }
 
@@ -204,6 +207,9 @@ void fast_rem_all_below_element_al(AL_TYPE cutoff, struct array_list *al) {
    }
    free(al->list);
    al->list = new_al->list;
+   al->elements = new_al->elements;
+   al->rear = new_al->rear;
+   al->head = 0;
    free(new_al);
 }
 
@@ -253,9 +259,6 @@ uint64_t partition_al(uint64_t l, uint64_t h, AL_TYPE * A) {
 
 void sort_al(struct array_list * al) {
    quicksort_al(al->head,al->rear-1,al->list);
-   foreach_al(i,al) {
-      printf("%lu ",i);
-   }
    printf("\n");
 }
 

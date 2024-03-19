@@ -116,7 +116,7 @@ int main(void) {
    printf("TESTING %-60s = ","fast_rem_all_element_al");
    fast_rem_all_element_al(1,al);
    if (find_al(1,al)) printf("fail<1> ");
-   rem_all_element_al(3,al);
+   fast_rem_all_element_al(3,al);
    if (find_al(3,al)) printf("fail<3> ");
    printf("COMPLETE\n");
 
